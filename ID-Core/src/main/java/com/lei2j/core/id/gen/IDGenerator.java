@@ -22,5 +22,5 @@ public abstract class IDGenerator {
      * 获取一个全局唯一ID
      * @return
      */
-    public abstract Object getId();
+    public abstract Object next();
 }

@@ -36,7 +36,7 @@ public class IDBufferGenerator extends IDGenerator {
     }
 
     @Override
-    public Object getId() {
+    public Object next() {
         while (true) {
             lock.readLock().lock();
             Object serialNo;

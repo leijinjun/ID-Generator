@@ -77,7 +77,7 @@ public class IDDoubleBufferGenerator extends IDGenerator {
     }
 
     @Override
-    public Long getId() {
+    public Long next() {
         Long id;
         while (true) {
             lock.readLock().lock();

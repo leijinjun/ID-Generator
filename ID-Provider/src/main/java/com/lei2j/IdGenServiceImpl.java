@@ -24,7 +24,7 @@ public class IdGenServiceImpl implements IdGenService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private Map<String,IDGenerator> idGeneratorMap = new HashMap<>();
+    private final Map<String,IDGenerator> idGeneratorMap = new HashMap<>();
 
     @Autowired
     IdGenSegmentServiceImpl idGenSegmentService;
@@ -42,6 +42,6 @@ public class IdGenServiceImpl implements IdGenService {
     public Long getId(String businessType) {
         IDGenerator idGenerator = idGeneratorMap.get(businessType);
         Objects.requireNonNull(idGenerator, "IdGenerator is null");
-        return (Long) idGenerator.getId();
+        return (Long) idGenerator.next();
     }
 }
