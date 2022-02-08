@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 单Buffer缓存号段
  * @author leijinjun
  **/
-public class IDBufferGenerator extends IDGenerator {
+public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
 
 //    private final ReentrantLock lock = new ReentrantLock(false);
 
@@ -18,7 +18,7 @@ public class IDBufferGenerator extends IDGenerator {
      */
     private volatile SerialNo idSegment;
 
-    public IDBufferGenerator(IDResource idResource) {
+    public SegmentIdBufferGenerator(IDResource idResource) {
         super(idResource);
         initBuffer();
     }

@@ -14,7 +14,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author leijinjun
  * @date 2021/10/9
  **/
-public class IDDoubleBufferGenerator extends IDGenerator {
+public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
 
 //    private final ReentrantLock lock = new ReentrantLock(false);
 
@@ -58,12 +58,12 @@ public class IDDoubleBufferGenerator extends IDGenerator {
      */
     private final int proportion = 30;
 
-    public IDDoubleBufferGenerator(IDResource idResource) {
+    public SegmentIdDoubleBufferGenerator(IDResource idResource) {
         this(idResource, new LinkedBuffer());
 //        this(idResource, new ArrayBuffer());
     }
 
-    public IDDoubleBufferGenerator(IDResource idResource, DoubleBuffer doubleBuffer) {
+    public SegmentIdDoubleBufferGenerator(IDResource idResource, DoubleBuffer doubleBuffer) {
         super(idResource);
         this.doubleBuffer = doubleBuffer;
         initBuffer();
