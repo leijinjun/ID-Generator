@@ -1,8 +1,10 @@
-package com.lei2j;
+package com.lei2j.idgen;
 
-import com.lei2j.core.id.gen.IDBufferGenerator;
-import com.lei2j.core.id.gen.IDDoubleBufferGenerator;
-import com.lei2j.core.id.gen.IDGenerator;
+import com.lei2j.IdGenService;
+import com.lei2j.core.idgen.IDDoubleBufferGenerator;
+import com.lei2j.core.idgen.IDGenerator;
+import com.lei2j.idgen.ConfigIdGen;
+import com.lei2j.idgen.IdGenSegmentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +21,7 @@ import java.util.Objects;
  * @date 2021/10/5
  **/
 @Service
-public class IdGenServiceImpl implements IdGenService {
+public class SegmentIdGenServiceImpl implements IdGenService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

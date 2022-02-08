@@ -1,4 +1,4 @@
-package com.lei2j.core.id.gen;
+package com.lei2j.core.idgen;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

@@ -1,4 +1,4 @@
-package com.lei2j.core.id.gen;
+package com.lei2j.core.idgen;
 
 import java.security.SecureRandom;
 import java.util.Objects;

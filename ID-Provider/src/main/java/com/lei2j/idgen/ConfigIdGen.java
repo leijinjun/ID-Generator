@@ -1,4 +1,4 @@
-package com.lei2j;
+package com.lei2j.idgen;
 
 import java.time.LocalDateTime;
 

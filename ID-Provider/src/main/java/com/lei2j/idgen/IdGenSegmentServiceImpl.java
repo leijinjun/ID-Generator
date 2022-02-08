@@ -1,11 +1,10 @@
-package com.lei2j;
+package com.lei2j.idgen;
 
-import com.lei2j.core.id.gen.SerialNo;
+import com.lei2j.core.idgen.SerialNo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Types;
 import java.time.LocalDateTime;
@@ -16,7 +15,6 @@ import java.util.Objects;
  * @date 2021/10/7
  **/
 @Service
-@Transactional
 public class IdGenSegmentServiceImpl {
 
     @Autowired

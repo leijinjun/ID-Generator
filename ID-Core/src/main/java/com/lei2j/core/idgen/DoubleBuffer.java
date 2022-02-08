@@ -1,4 +1,4 @@
-package com.lei2j.core.id.gen;
+package com.lei2j.core.idgen;
 
 /**
  * 双Buffer缓存结构接口

@@ -1,6 +1,6 @@
-package com.lei2j;
+package com.lei2j.idgen;
 
-import com.lei2j.core.id.gen.SerialNo;
+import com.lei2j.core.idgen.SerialNo;
 
 import java.util.concurrent.atomic.AtomicLong;
 
