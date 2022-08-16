@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 单Buffer缓存号段
+ * 单Buffer缓存id片段
  * @author leijinjun
  **/
 public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
@@ -18,6 +18,11 @@ public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
      */
     private volatile SerialNo idSegment;
 
+    /**
+     * buffer是否已初始化
+     */
+    private volatile boolean init;
+
     public SegmentIdBufferGenerator(IDResource idResource) {
         super(idResource);
         initBuffer();
@@ -25,14 +30,16 @@ public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
 
     @Override
     public void initBuffer() {
+        assert !init;
         supplement();
+        init = true;
     }
 
     /**
      * 补充缓存
      */
     private void supplement(){
-        idSegment = idResource.getIdSegment();
+        idSegment = idResource.get();
     }
 
     @Override

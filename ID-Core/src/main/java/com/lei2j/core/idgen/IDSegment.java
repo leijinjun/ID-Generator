@@ -1,10 +1,9 @@
-package com.lei2j.idgen;
-
-import com.lei2j.core.idgen.SerialNo;
+package com.lei2j.core.idgen;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * Long类型Id分段对象
  * @author leijinjun
  * @date 2021/10/7
  **/
@@ -13,14 +12,25 @@ public class IDSegment implements SerialNo {
     /**
      * inclusive
      */
-    private Long minId;
+    private long minId;
 
     /**
      * exclusive
      */
-    private Long maxId;
+    private long maxId;
 
-    private AtomicLong curId;
+    private final AtomicLong curId;
+
+    /**
+     * 构造一个顺序增长的Id分段存储器
+     * @param minId 最小id（包含）
+     * @param maxId 最大id（不包含）
+     */
+    public IDSegment(long minId, long maxId) {
+        this.minId = minId;
+        this.maxId = maxId;
+        this.curId = new AtomicLong(minId);
+    }
 
     @Override
     public Long getSerialNo() {
@@ -41,13 +51,7 @@ public class IDSegment implements SerialNo {
         return (int) (maxId - curId.get());
     }
 
-    public IDSegment(Long minId, Long maxId) {
-        this.minId = minId;
-        this.maxId = maxId;
-        this.curId = new AtomicLong(minId);
-    }
-
-    public Long getMinId() {
+    public long getMinId() {
         return minId;
     }
 
@@ -55,19 +59,11 @@ public class IDSegment implements SerialNo {
         this.minId = minId;
     }
 
-    public Long getMaxId() {
+    public long getMaxId() {
         return maxId;
     }
 
     public void setMaxId(Long maxId) {
         this.maxId = maxId;
-    }
-
-    public AtomicLong getCurId() {
-        return curId;
-    }
-
-    public void setCurId(AtomicLong curId) {
-        this.curId = curId;
     }
 }

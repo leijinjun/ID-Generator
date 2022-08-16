@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 双缓存Buffer
+ * 双缓存Buffer id片段
  * @author leijinjun
  * @date 2021/10/9
  **/
@@ -53,10 +53,17 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
      */
     private final static int ADDED = 0x3;
 
+    private final static int DEFAULT_WARNING_VAL = 30;
+
     /**
      * 当前缓存已使用量百分比
      */
-    private final int proportion = 30;
+    private final int earlyWarningValue;
+
+    /**
+     * buffer是否已初始化
+     */
+    private volatile boolean init;
 
     public SegmentIdDoubleBufferGenerator(IDResource idResource) {
         this(idResource, new LinkedBuffer());
@@ -64,26 +71,33 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
     }
 
     public SegmentIdDoubleBufferGenerator(IDResource idResource, DoubleBuffer doubleBuffer) {
+        this(idResource, doubleBuffer, DEFAULT_WARNING_VAL);
+    }
+
+    public SegmentIdDoubleBufferGenerator(IDResource idResource, DoubleBuffer doubleBuffer, int earlyWarningValue) {
         super(idResource);
         this.doubleBuffer = doubleBuffer;
+        this.earlyWarningValue = earlyWarningValue;
         initBuffer();
     }
 
     @Override
     public void initBuffer() {
-        doubleBuffer.addSegment(Objects.requireNonNull(idResource.getIdSegment(), "idSegment is null"));
+        assert !init;
+        doubleBuffer.addSegment(Objects.requireNonNull(idResource.get(), "idSegment is null"));
         doubleBuffer.switchBuffer();
         suppleState.set(ENOUGH);
+        init = true;
     }
 
     @Override
-    public Long next() {
-        Long id;
+    public Object next() {
+        Object id;
         while (true) {
             lock.readLock().lock();
             try {
                 id = doubleBuffer.getId();
-                if (doubleBuffer.startSupplementNextBuffer(proportion)) {
+                if (doubleBuffer.ifSupplementNextBuffer(earlyWarningValue)) {
                     if (suppleState.compareAndSet(ENOUGH, WAIT_SUPPLE)) {
 //                doubleBufferExecuteService.execute(this::supply);
                         doubleBufferExecuteService.schedule(this::supplement, (new SecureRandom().nextInt(4) + 1) * 10
@@ -104,7 +118,7 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
                             supplement();
                         }
                         //当前Buffer无缓存号段并且下一Buffer已补充完毕
-                        if (!doubleBuffer.hasCurrentRemaining() && suppleState.compareAndSet(ADDED, ENOUGH)) {
+                        if (!doubleBuffer.hasRemaining() && suppleState.compareAndSet(ADDED, ENOUGH)) {
                             doubleBuffer.switchBuffer();
                         }
                     } finally {
@@ -164,7 +178,7 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
             }
             SerialNo next = doubleBuffer.nextBuffer();
             if (next == null || next.remain() <= 0) {
-                doubleBuffer.addSegment(idResource.getIdSegment());
+                doubleBuffer.addSegment(idResource.get());
             }
             //补充完毕
             suppleState.compareAndSet(WAIT_SUPPLE, ADDED);
@@ -201,13 +215,13 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
         }
 
         @Override
-        public boolean startSupplementNextBuffer(int proportion) {
+        public boolean ifSupplementNextBuffer(int proportion) {
             int capacity = arrBuf[currentPos].capacity();
             return capacity * proportion / 100 < (capacity - arrBuf[currentPos].remain());
         }
 
         @Override
-        public boolean hasCurrentRemaining() {
+        public boolean hasRemaining() {
             return arrBuf[currentPos] != null && arrBuf[currentPos] != null && arrBuf[currentPos].remain() > 0;
         }
 
@@ -217,11 +231,11 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
         }
 
         @Override
-        public Long getId() {
-            return (Long) arrBuf[currentPos].getSerialNo();
+        public Object getId() {
+            return arrBuf[currentPos].getSerialNo();
         }
 
-        private int getNextPos(){
+        private int getNextPos() {
             return (currentPos + 1) % 2;
         }
     }
@@ -231,22 +245,18 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
      */
     private static class LinkedBuffer implements DoubleBuffer {
 
-        private final SegmentBuffer head = new SegmentBuffer();
+        private final LinkedBuffer head = new LinkedBuffer();
 
-        private SegmentBuffer current;
+        private LinkedBuffer next = new LinkedBuffer();
+
+        private LinkedBuffer current;
+
+        private SerialNo idSegment;
 
         private int currentSegmentCapacity;
 
-        static class SegmentBuffer {
-
-            private SerialNo idSegment;
-
-            private SegmentBuffer next;
-
-        }
-
         public LinkedBuffer() {
-            SegmentBuffer tail = new SegmentBuffer();
+            LinkedBuffer tail = new LinkedBuffer();
             this.head.next = tail;
             tail.next = this.head;
         }
@@ -271,12 +281,12 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
         }
 
         @Override
-        public boolean startSupplementNextBuffer(int proportion) {
+        public boolean ifSupplementNextBuffer(int proportion) {
             return currentSegmentCapacity * proportion / 100 < (currentSegmentCapacity-current.idSegment.remain());
         }
 
         @Override
-        public boolean hasCurrentRemaining() {
+        public boolean hasRemaining() {
             return current != null && current.idSegment != null && current.idSegment.remain() > 0;
         }
 
@@ -286,8 +296,8 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
         }
 
         @Override
-        public Long getId(){
-            return (Long) current.idSegment.getSerialNo();
+        public Object getId(){
+            return current.idSegment.getSerialNo();
         }
     }
 }

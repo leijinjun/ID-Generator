@@ -1,4 +1,4 @@
-package com.lei2j.idgen;
+package com.lei2j.idgen.database;
 
 import java.time.LocalDateTime;
 
@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
  * @author leijinjun
  * @date 2021/10/7
  **/
-public class ConfigIdGen {
+public class ConfigIdGenPO {
 
     private int id;
 

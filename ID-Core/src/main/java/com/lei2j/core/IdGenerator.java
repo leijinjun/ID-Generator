@@ -1,6 +1,7 @@
 package com.lei2j.core;
 
 /**
+ *  唯一id生成器
  * @author leijinjun
  * @date 2022/2/8
  **/

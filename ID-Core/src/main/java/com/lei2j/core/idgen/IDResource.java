@@ -1,13 +1,11 @@
 package com.lei2j.core.idgen;
 
+import java.util.function.Supplier;
+
 /**
+ * ID资源接口
  * @author leijinjun
  **/
-public interface IDResource {
+public interface IDResource extends Supplier<SerialNo> {
 
-    /**
-     * 获取
-     * @return
-     */
-    SerialNo getIdSegment();
 }

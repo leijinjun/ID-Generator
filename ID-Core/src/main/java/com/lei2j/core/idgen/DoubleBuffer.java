@@ -23,14 +23,14 @@ public interface DoubleBuffer {
      * @param proportion
      * @return
      */
-    boolean startSupplementNextBuffer(int proportion);
+    boolean ifSupplementNextBuffer(int proportion);
 
     /**
      * 判断当前Buffer是否还有库存，返回{@code true}表示还有剩余。
      *
      * @return
      */
-    boolean hasCurrentRemaining();
+    boolean hasRemaining();
 
     /**
      * 获取备用Buffer,可能为空
@@ -42,5 +42,5 @@ public interface DoubleBuffer {
      * 获取一个唯一Id
      * @return
      */
-    Long getId();
+    Object getId();
 }
