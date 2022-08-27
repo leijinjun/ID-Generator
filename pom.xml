@@ -5,14 +5,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.lei2j</groupId>
-  <artifactId>ID-Generator</artifactId>
+  <artifactId>id-generator</artifactId>
   <version>0.0.1</version>
   <modules>
-    <module>ID-Core</module>
-    <module>ID-Provider</module>
+    <module>id-core</module>
+    <module>id-provider</module>
   </modules>
   <packaging>pom</packaging>
-  <name>ID-Generator</name>
+  <name>id-generator</name>
 
   <parent>
     <groupId>org.springframework.boot</groupId>

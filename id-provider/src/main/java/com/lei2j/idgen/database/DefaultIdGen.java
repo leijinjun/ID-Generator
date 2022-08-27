@@ -2,7 +2,7 @@ package com.lei2j.idgen.database;
 
 import com.lei2j.core.idgen.IDResource;
 import com.lei2j.core.idgen.SegmentIdBufferGenerator;
-import com.lei2j.idgen.database.provider.DefaultSegmentProvider;
+import com.lei2j.idgen.database.resource.DefaultIdSegmentResource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultIdGen {
 
-    private final DefaultSegmentProvider provider;
+    private final DefaultIdSegmentResource provider;
 
-    public DefaultIdGen(DefaultSegmentProvider provider) {
+    public DefaultIdGen(DefaultIdSegmentResource provider) {
         this.provider = provider;
     }
 

@@ -1,4 +1,4 @@
-package com.lei2j.idgen.database.provider;
+package com.lei2j.idgen.database.resource;
 
 import com.lei2j.core.idgen.IDSegment;
 import com.lei2j.core.idgen.SerialNo;
@@ -15,12 +15,12 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
- * 基于Mysql的乐观锁ID分段提供者
+ * 基于Mysql的悲观锁ID资源段实现
  * @author leijinjun
  * @date 2021/10/7
  **/
 @Service
-public class DefaultSegmentProvider {
+public class DefaultIdSegmentResource {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
