@@ -9,9 +9,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>id-provider</artifactId>
+  <artifactId>id-demo</artifactId>
 
-  <name>id-provider</name>
+  <name>id-demo</name>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>com.lei2j</groupId>
-      <artifactId>ID-Core</artifactId>
+      <artifactId>id-core</artifactId>
       <version>0.0.1</version>
     </dependency>
   </dependencies>

@@ -3,20 +3,31 @@ package com.lei2j.core.snowflake;
 import com.lei2j.core.IdGenerator;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * SnowFlake算法ID生成器
+ * SnowFlake算法ID生成器，实例线程安全
  * @author leijinjun
  * @date 2021/11/8
  **/
 public class SnowFlakeGenerator implements IdGenerator {
 
+    /**
+     *  默认应用id，用于单体应用程序的默认机器id
+     */
+    public final static long DEFAULT_WORK_ID = 1;
+
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
+    /**
+     * 生成id的可操作最大bits数
+     */
     private static final long MAX_BITS = 63;
 
     /**
@@ -50,7 +61,7 @@ public class SnowFlakeGenerator implements IdGenerator {
     private final long workerId;
 
     /**
-     * 最后一次的时间戳
+     * 最后一次的时间戳减去起始时间戳(START_TIME)
      */
     private volatile long lastTimeStamp;
 
@@ -59,6 +70,24 @@ public class SnowFlakeGenerator implements IdGenerator {
      */
     private final AtomicLong sequence = new AtomicLong(0);
 
+    /**
+     * 使用默认的配置项{@Link DefaultSnowFlakeConfig}
+     */
+    public SnowFlakeGenerator(){
+        this(new DefaultSnowFlakeConfig());
+    }
+
+    /**
+     * @param snowFlakeConfig 雪花算法配置项
+     */
+    public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig){
+        this(snowFlakeConfig, DEFAULT_WORK_ID);
+    }
+
+    /**
+     * @param snowFlakeConfig 雪花算法配置项
+     * @param workerId
+     */
     public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig, long workerId) {
         Objects.requireNonNull(snowFlakeConfig, "snowFlakeConfig is null");
 
@@ -80,7 +109,7 @@ public class SnowFlakeGenerator implements IdGenerator {
             throw new IllegalArgumentException(snowFlakeConfig.getSequenceBits() + "less than 0");
         }
         if (timestampBits + workerIdBits + sequenceBits > MAX_BITS) {
-            throw new IllegalArgumentException("snowFlakeConfig is invalid");
+            throw new IllegalArgumentException("timestampBits + workerIdBits + sequenceBits great than " + MAX_BITS);
         }
         if (Long.toBinaryString(this.workerId = workerId).length() > workerIdBits) {
             throw new IllegalArgumentException("workId too big");
@@ -102,19 +131,12 @@ public class SnowFlakeGenerator implements IdGenerator {
 
     @Override
     public Object next() {
-        long currentTime = getCurrentTime();
-        final long lt = lastTimeStamp;
-        if (currentTime < lt) {
-            throw new RuntimeException("时间出现回拨");
-        }
-        lastTimeStamp = currentTime;
-        long ts = currentTime - START_TIME;
-        if (ts > maxTimeStamp) {
-            throw new RuntimeException("时间戳超出限制");
-        }
         final long workId = workerId;
         long sequenceId;
+        long ts;
         while (true) {
+            ts = getTimeStamp();
+            this.lastTimeStamp = ts;
             Lock readLock = readLock();
             readLock.lock();
             try {
@@ -137,13 +159,41 @@ public class SnowFlakeGenerator implements IdGenerator {
     private void resetSequence(long currentValue) {
         if (sequence.get() > maxSequenceId) {
             Lock writeLock = writeLock();
-            writeLock.lock();
             try {
-                sequence.set(0L);
-            } finally {
-                writeLock.unlock();
+                writeLock.tryLock(20, TimeUnit.MILLISECONDS);
+                try {
+                    if (sequence.get() > maxSequenceId) {
+                        sequence.set(0L);
+                    }
+                } finally {
+                    writeLock.unlock();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+    }
+
+    private long getTimeStamp(){
+        long currentTime;
+        for (int i = 0; true; i++) {
+            if ((currentTime = getCurrentTime()) >= (this.lastTimeStamp + START_TIME)) {
+                break;
+            }
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (i > 2) {
+                throw new RuntimeException("时间出现回拨");
+            }
+        }
+        long ts = currentTime - START_TIME;
+        if (ts > maxTimeStamp) {
+            throw new RuntimeException("时间戳超出限制");
+        }
+        return ts;
     }
 
     /**

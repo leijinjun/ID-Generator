@@ -9,9 +9,9 @@ public interface DoubleBuffer {
 
     /**
      * 添加一个号段到Buffer中
-     * @param serialNo
+     * @param ID
      */
-    void addSegment(SerialNo serialNo);
+    void addSegment(ID ID);
 
     /**
      * 切换
@@ -36,7 +36,7 @@ public interface DoubleBuffer {
      * 获取备用Buffer,可能为空
      * @return
      */
-    SerialNo nextBuffer();
+    ID nextBuffer();
 
     /**
      * 获取一个唯一Id

@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultIdGen {
 
-    private final DefaultIdSegmentResource provider;
+    private final DefaultIdSegmentResource resource;
 
-    public DefaultIdGen(DefaultIdSegmentResource provider) {
-        this.provider = provider;
+    public DefaultIdGen(DefaultIdSegmentResource resource) {
+        this.resource = resource;
     }
 
     public Object next(String businessType) {
-        final IDResource supplier = () -> provider.getIdSegment(businessType);
-        final SegmentIdBufferGenerator generator = new SegmentIdBufferGenerator(supplier);
+        final IDResource idResource = () -> resource.getIdSegment(businessType);
+        final SegmentIdBufferGenerator generator = new SegmentIdBufferGenerator(idResource);
         return generator.next();
     }
 }

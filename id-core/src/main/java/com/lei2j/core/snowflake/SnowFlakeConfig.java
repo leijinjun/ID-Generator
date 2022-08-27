@@ -1,6 +1,7 @@
 package com.lei2j.core.snowflake;
 
 /**
+ * 雪花算法配置项
  * @author leijinjun
  * @date 2022/2/8
  **/

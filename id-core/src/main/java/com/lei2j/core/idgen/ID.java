@@ -5,13 +5,13 @@ package com.lei2j.core.idgen;
  * @author leijinjun
  * @date 2021/10/4
  **/
-public interface SerialNo {
+public interface ID {
 
     /**
      * 获取唯一一个序列号
-     * @return 返回一个唯一id
+     * @return 返回一个唯一id，
      */
-    Object getSerialNo();
+    Object getId();
 
     /**
      * 获取id片段容量

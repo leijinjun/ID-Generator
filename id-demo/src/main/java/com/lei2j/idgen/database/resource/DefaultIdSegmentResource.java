@@ -1,7 +1,7 @@
 package com.lei2j.idgen.database.resource;
 
 import com.lei2j.core.idgen.IDSegment;
-import com.lei2j.core.idgen.SerialNo;
+import com.lei2j.core.idgen.ID;
 import com.lei2j.idgen.database.ConfigIdGenPO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -25,8 +25,8 @@ public class DefaultIdSegmentResource {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Transactional
-    public SerialNo getIdSegment(String bizType) {
+    @Transactional(rollbackFor = Exception.class)
+    public ID getIdSegment(String bizType) {
         final Stream<ConfigIdGenPO> stream = jdbcTemplate.queryForStream("select id,cur_id,step,`version` from c_id_gen where " +
                 "biz_type = ? for update", new BeanPropertyRowMapper<>(ConfigIdGenPO.class), bizType);
         final ConfigIdGenPO configIdGenPo = Objects.requireNonNull(stream.findFirst().orElse(null), "configIdGenPO is null");

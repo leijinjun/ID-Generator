@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author leijinjun
  * @date 2021/10/7
  **/
-public class IDSegment implements SerialNo {
+public class IDSegment implements ID {
 
     /**
      * inclusive
@@ -33,7 +33,7 @@ public class IDSegment implements SerialNo {
     }
 
     @Override
-    public Long getSerialNo() {
+    public Long getId() {
         if (curId.get() >= maxId) {
             return null;
         }

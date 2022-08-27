@@ -16,7 +16,7 @@ public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
     /**
      * ID缓存区
      */
-    private volatile SerialNo idSegment;
+    private volatile ID idSegment;
 
     /**
      * buffer是否已初始化
@@ -48,7 +48,7 @@ public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
             lock.readLock().lock();
             Object serialNo;
             try {
-                serialNo = idSegment.getSerialNo();
+                serialNo = idSegment.getId();
                 if (serialNo != null) {
                     return serialNo;
                 }
@@ -58,7 +58,7 @@ public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
             try {
                 if (lock.writeLock().tryLock(50, TimeUnit.MILLISECONDS)) {
                     try {
-                        serialNo = idSegment.getSerialNo();
+                        serialNo = idSegment.getId();
                         if (serialNo != null) {
                             return serialNo;
                         }

@@ -176,7 +176,7 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
             if (suppleState.get() != WAIT_SUPPLE) {
                 return;
             }
-            SerialNo next = doubleBuffer.nextBuffer();
+            ID next = doubleBuffer.nextBuffer();
             if (next == null || next.remain() <= 0) {
                 doubleBuffer.addSegment(idResource.get());
             }
@@ -193,16 +193,16 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
      */
     private static class ArrayBuffer implements DoubleBuffer {
 
-        private final SerialNo[] arrBuf = new SerialNo[2];
+        private final ID[] arrBuf = new ID[2];
 
         private volatile int currentPos = -1;
 
         @Override
-        public void addSegment(SerialNo serialNo) {
+        public void addSegment(ID ID) {
             if (currentPos < 0) {
-                arrBuf[0] = serialNo;
+                arrBuf[0] = ID;
             }
-            arrBuf[getNextPos()] = serialNo;
+            arrBuf[getNextPos()] = ID;
         }
 
         @Override
@@ -226,13 +226,13 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
         }
 
         @Override
-        public SerialNo nextBuffer() {
+        public ID nextBuffer() {
             return arrBuf[getNextPos()];
         }
 
         @Override
         public Object getId() {
-            return arrBuf[currentPos].getSerialNo();
+            return arrBuf[currentPos].getId();
         }
 
         private int getNextPos() {
@@ -251,7 +251,7 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
 
         private LinkedBuffer current;
 
-        private SerialNo idSegment;
+        private ID idSegment;
 
         private int currentSegmentCapacity;
 
@@ -262,11 +262,11 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
         }
 
         @Override
-        public void addSegment(SerialNo serialNo){
+        public void addSegment(ID ID){
             if (this.current == null) {
-                this.head.idSegment = serialNo;
+                this.head.idSegment = ID;
             } else {
-                this.current.next.idSegment = serialNo;
+                this.current.next.idSegment = ID;
             }
         }
 
@@ -291,13 +291,13 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
         }
 
         @Override
-        public SerialNo nextBuffer() {
+        public ID nextBuffer() {
             return current != null && current.next != null ? current.next.idSegment : null;
         }
 
         @Override
         public Object getId(){
-            return current.idSegment.getSerialNo();
+            return current.idSegment.getId();
         }
     }
 }
