@@ -4,11 +4,10 @@ import static org.junit.Assert.assertTrue;
 
 import com.lei2j.core.IdGenerator;
 import com.lei2j.core.snowflake.SnowFlakeGenerator;
+import com.lei2j.core.snowflake.clock.AccumulateHistoricalClock;
 import org.junit.Test;
 import org.springframework.util.Assert;
 
-import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -31,7 +30,7 @@ public class AppTest
         Set<Object> set = new CopyOnWriteArraySet<>();
         int length = 100000;
         final ExecutorService executorService = Executors.newFixedThreadPool(100);
-        final IdGenerator snowFlakeGenerator = new SnowFlakeGenerator();
+        final IdGenerator snowFlakeGenerator = new SnowFlakeGenerator(new AccumulateHistoricalClock());
         CountDownLatch latch = new CountDownLatch(length);
         final long l1 = System.currentTimeMillis();
         for (int i = 0; i < length; i++) {

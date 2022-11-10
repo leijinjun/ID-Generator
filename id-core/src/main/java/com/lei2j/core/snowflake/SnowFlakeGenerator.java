@@ -1,6 +1,8 @@
 package com.lei2j.core.snowflake;
 
 import com.lei2j.core.IdGenerator;
+import com.lei2j.core.snowflake.clock.Clock;
+import com.lei2j.core.snowflake.clock.LocalClock;
 
 import java.util.Objects;
 
@@ -47,37 +49,39 @@ public class SnowFlakeGenerator implements IdGenerator {
     private final long workerId;
 
     /**
-     * 最后一次的时间戳减去起始时间戳(START_TIME)
-     */
-    private volatile long lastTimeStamp;
-
-
-    /**
      * 当前序列化
      */
-    private static long sequenceId = 0;
+    private long sequenceId = 0;
+
+    private final Clock clock;
 
     /**
      * 使用默认的配置项{@Link DefaultSnowFlakeConfig}
      */
     public SnowFlakeGenerator(){
-        this(new DefaultSnowFlakeConfig());
+        this(new DefaultSnowFlakeConfig(),new LocalClock());
+    }
+
+    public SnowFlakeGenerator(Clock clock) {
+        this(new DefaultSnowFlakeConfig(), clock);
     }
 
     /**
+     *  使用默认节点id{@code DEFAULT_WORK_ID}，作为本节点id
      * @param snowFlakeConfig 雪花算法配置项
      */
-    public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig){
-        this(snowFlakeConfig, DEFAULT_WORK_ID);
+    public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig, Clock clock) {
+        this(snowFlakeConfig, clock, DEFAULT_WORK_ID);
     }
 
     /**
+     * @param clock 时钟源
      * @param snowFlakeConfig 雪花算法配置项
      * @param workerId
      */
-    public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig, long workerId) {
+    public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig, Clock clock, long workerId) {
         Objects.requireNonNull(snowFlakeConfig, "snowFlakeConfig is null");
-
+        this.clock = Objects.requireNonNull(clock, "clock is null");
         //时间戳bit位数
         long timestampBits;
         if ((timestampBits = snowFlakeConfig.getTimeBits()) <= 0) {
@@ -116,29 +120,23 @@ public class SnowFlakeGenerator implements IdGenerator {
 
     @Override
     public synchronized Object next() {
-        long timeStamp = getCurrentTime();
-        //处理时钟回拨
-        if (timeStamp < lastTimeStamp) {
-            throw new RuntimeException("时钟回拨");
-        }
-        if (timeStamp == this.lastTimeStamp) {
+        long nextTick = getCurrentTime();
+        final long lastTimeStamp = clock.lastTimeStamp();
+        if (nextTick < lastTimeStamp) {
+            nextTick = nextTime(nextTick);
+        }else if (nextTick == lastTimeStamp){
             if ((++sequenceId) > maxSequenceId) {
-                timeStamp = nextTime(timeStamp);
+                nextTick = nextTime(nextTick);
                 sequenceId = 0L;
             }
-        } else {
+        }else {
             sequenceId = 0L;
         }
-        this.lastTimeStamp = timeStamp;
-        return (timeStamp << timeStampShiftLeft) | (workerId << workerIdShiftLeft) | sequenceId;
-    }
-
-    private long nextTime(long lastTimeStamp) {
-        long nextTimeTick = getCurrentTime();
-        while (nextTimeTick <= lastTimeStamp) {
-            nextTimeTick = getCurrentTime();
+        if (nextTick < clock.lastTimeStamp()) {
+            throw new RuntimeException("时钟回拨");
         }
-        return nextTimeTick;
+        clock.updateLastTimeStamp(nextTick);
+        return ((nextTick - START_TIME) << timeStampShiftLeft) | (workerId << workerIdShiftLeft) | sequenceId;
     }
 
     /**
@@ -146,14 +144,15 @@ public class SnowFlakeGenerator implements IdGenerator {
      * @return
      */
     private long getCurrentTime(){
-        return System.currentTimeMillis();
+        return clock.now();
     }
 
-    public static void main(String[] args) {
-        DefaultSnowFlakeConfig snowFlakeConfig = new DefaultSnowFlakeConfig();
-        SnowFlakeGenerator snowFlakeGenerator = new SnowFlakeGenerator(snowFlakeConfig, 255);
-        System.out.println("ID:" + snowFlakeGenerator.next());
-        System.out.println("ID:" + snowFlakeGenerator.next());
-        System.out.println("ID:" + snowFlakeGenerator.next());
+    /**
+     * 返回一个比当前时间戳大的时间戳
+     * @param nextTick 从时钟类{@code Clock}获取的最新时间戳
+     * @return
+     */
+    private long nextTime(long nextTick) {
+        return clock.nextTime(nextTick);
     }
 }
