@@ -9,9 +9,9 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>id-demo</artifactId>
+  <artifactId>id-extension</artifactId>
 
-  <name>id-demo</name>
+  <name>id-extension</name>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>

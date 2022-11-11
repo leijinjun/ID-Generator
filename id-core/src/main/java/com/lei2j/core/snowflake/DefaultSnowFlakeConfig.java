@@ -35,4 +35,9 @@ public class DefaultSnowFlakeConfig implements SnowFlakeConfig {
     public long getSequenceBits() {
         return sequenceBits;
     }
+
+    @Override
+    public long maxWorkId() {
+        return ~(-1L << workerIdBits);
+    }
 }

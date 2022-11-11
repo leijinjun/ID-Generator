@@ -24,4 +24,10 @@ public interface SnowFlakeConfig {
      * @return
      */
     long getSequenceBits();
+
+    /**
+     * 根据{@link #getWorkerBits()}，返回最大节点id
+     * @return 最大节点id
+     */
+    long maxWorkId();
 }

@@ -8,7 +8,7 @@ ID资源：指id源。如数据库、Redis、应用程序等可以产生ID的源
 2. **IDResource**接口。定义Id资源器。
 3. **SnowFlakeGenerator**雪花ID生成器。
 ### 快速开始
-id-demo模块
+id-extension模块
 1. 生成雪花ID
 ```java
 final IdGenerator snowFlakeGenerator = new SnowFlakeGenerator();

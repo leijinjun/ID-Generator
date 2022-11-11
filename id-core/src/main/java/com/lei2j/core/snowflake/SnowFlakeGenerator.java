@@ -29,11 +29,6 @@ public class SnowFlakeGenerator implements IdGenerator {
     private static final long START_TIME = 1631203200000L;
 
     /**
-     * 序列号最大值
-     */
-    private final long maxSequenceId;
-
-    /**
      * 时间戳左移位数
      */
     private final long timeStampShiftLeft;
@@ -49,9 +44,14 @@ public class SnowFlakeGenerator implements IdGenerator {
     private final long workerId;
 
     /**
-     * 当前序列化
+     * 当前序列化id
      */
     private long sequenceId = 0;
+
+    /**
+     * 序列号最大值
+     */
+    private final long maxSequenceId;
 
     private final Clock clock;
 
@@ -109,12 +109,10 @@ public class SnowFlakeGenerator implements IdGenerator {
         workerIdShiftLeft = sequenceBits;
         //时间戳左移位数
         timeStampShiftLeft = sequenceBits + workerIdBits;
-        //本机服务ID最大值
-        long maxWorkerId = ~(-1L << workerIdBits);
         //序列号最大值
         maxSequenceId = ~(-1L << sequenceBits);
-        if (workerId > maxWorkerId) {
-            throw new IllegalArgumentException("workId:" + workerId + " > max value:" + maxWorkerId);
+        if (workerId > snowFlakeConfig.maxWorkId()) {
+            throw new IllegalArgumentException("workId:" + workerId + " > max value:" + snowFlakeConfig.maxWorkId());
         }
     }
 

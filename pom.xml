@@ -9,7 +9,7 @@
   <version>0.0.1</version>
   <modules>
     <module>id-core</module>
-    <module>id-demo</module>
+    <module>id-extension</module>
   </modules>
   <packaging>pom</packaging>
   <name>id-generator</name>
