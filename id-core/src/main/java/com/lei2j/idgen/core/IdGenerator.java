@@ -1,4 +1,4 @@
-package com.lei2j.core;
+package com.lei2j.idgen.core;
 
 /**
  *  唯一id生成器

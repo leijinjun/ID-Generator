@@ -1,8 +1,8 @@
-package com.lei2j.core.snowflake;
+package com.lei2j.idgen.core.snowflake;
 
-import com.lei2j.core.IdGenerator;
-import com.lei2j.core.snowflake.clock.Clock;
-import com.lei2j.core.snowflake.clock.LocalClock;
+import com.lei2j.idgen.core.IdGenerator;
+import com.lei2j.idgen.core.snowflake.clock.Clock;
+import com.lei2j.idgen.core.snowflake.clock.LocalClock;
 
 import java.util.Objects;
 
@@ -12,11 +12,6 @@ import java.util.Objects;
  * @date 2021/11/8
  **/
 public class SnowFlakeGenerator implements IdGenerator {
-
-    /**
-     *  默认应用id，用于单体应用程序的默认机器id
-     */
-    public final static long DEFAULT_WORK_ID = 1;
 
     /**
      * 生成id的可操作最大bits数
@@ -67,19 +62,10 @@ public class SnowFlakeGenerator implements IdGenerator {
     }
 
     /**
-     *  使用默认节点id{@code DEFAULT_WORK_ID}，作为本节点id
+     * @param clock 时钟源
      * @param snowFlakeConfig 雪花算法配置项
      */
     public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig, Clock clock) {
-        this(snowFlakeConfig, clock, DEFAULT_WORK_ID);
-    }
-
-    /**
-     * @param clock 时钟源
-     * @param snowFlakeConfig 雪花算法配置项
-     * @param workerId
-     */
-    public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig, Clock clock, long workerId) {
         Objects.requireNonNull(snowFlakeConfig, "snowFlakeConfig is null");
         this.clock = Objects.requireNonNull(clock, "clock is null");
         //时间戳bit位数
@@ -102,7 +88,7 @@ public class SnowFlakeGenerator implements IdGenerator {
         if (timestampBits + workerIdBits + sequenceBits > MAX_BITS) {
             throw new IllegalArgumentException("timestampBits + workerIdBits + sequenceBits great than " + MAX_BITS);
         }
-        if (Long.toBinaryString(this.workerId = workerId).length() > workerIdBits) {
+        if (Long.toBinaryString(this.workerId = snowFlakeConfig.getWorkId()).length() > workerIdBits) {
             throw new IllegalArgumentException("workId too big");
         }
         //本机服务ID左移位数
@@ -116,6 +102,10 @@ public class SnowFlakeGenerator implements IdGenerator {
         }
     }
 
+    /**
+     *
+     * @return 返回一个Long类型的id
+     */
     @Override
     public synchronized Object next() {
         long nextTick = getCurrentTime();

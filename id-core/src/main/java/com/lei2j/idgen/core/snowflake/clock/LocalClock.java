@@ -1,4 +1,4 @@
-package com.lei2j.core.snowflake.clock;
+package com.lei2j.idgen.core.snowflake.clock;
 
 import java.util.concurrent.TimeUnit;
 

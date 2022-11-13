@@ -1,4 +1,4 @@
-package com.lei2j.core.snowflake;
+package com.lei2j.idgen.core.snowflake;
 
 /**
  * 雪花算法配置项
@@ -30,4 +30,10 @@ public interface SnowFlakeConfig {
      * @return 最大节点id
      */
     long maxWorkId();
+
+    /**
+     * 返回一个节点id
+     * @return 节点id
+     */
+    long getWorkId();
 }

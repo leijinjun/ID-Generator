@@ -1,4 +1,4 @@
-package com.lei2j.core.idgen;
+package com.lei2j.idgen.core.segment;
 
 import java.util.function.Supplier;
 

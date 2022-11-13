@@ -1,6 +1,6 @@
-package com.lei2j.core.idgen;
+package com.lei2j.idgen.core.segment;
 
-import com.lei2j.core.IdGenerator;
+import com.lei2j.idgen.core.IdGenerator;
 
 /**
  *  抽象id片段生成器
