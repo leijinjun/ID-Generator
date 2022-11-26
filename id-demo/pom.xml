@@ -28,7 +28,7 @@
         <dependency>
             <groupId>com.lei2j</groupId>
             <artifactId>id-extend</artifactId>
-            <version>${project.version}</version>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 
