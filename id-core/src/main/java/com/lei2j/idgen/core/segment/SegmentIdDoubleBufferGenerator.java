@@ -16,8 +16,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  **/
 public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
 
-//    private final ReentrantLock lock = new ReentrantLock(false);
-
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
 
     private final ScheduledExecutorService doubleBufferExecuteService = new ScheduledThreadPoolExecutor(1,
@@ -131,46 +129,12 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
             }
         }
 
-        /*//当前缓存Buffer耗尽
-        while ((id = linkedBuffer.getId()) == null) {
-            try {
-                if (lock.tryLock(50, TimeUnit.MILLISECONDS)) {
-                    try {
-                        //如果第二Buffer还未补充
-                        if (suppleState.get() == WAIT_SUPPLE) {
-                            supplement();
-                        }
-                        //必须第二Buffer补充完毕后才切换Buffer
-                        if (suppleState.get() == ADDED && !linkedBuffer.hasCurrentRemaining()) {
-                            linkedBuffer.switchBuffer();
-                            //切换Buffer完成后，状态进行置换
-                            suppleState.compareAndSet(ADDED, UN_SUPPLE);
-                        }
-                    } finally {
-                        lock.unlock();
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                //线程被中断直接返回
-                return null;
-            }
-        }
-        //当前Buffer号段紧缺，补充第二Buffer
-        if (linkedBuffer.startSupplementNextBuffer(proportion)) {
-            if (suppleState.compareAndSet(UN_SUPPLE, WAIT_SUPPLE)) {
-//                doubleBufferExecuteService.execute(this::supply);
-                doubleBufferExecuteService.schedule(this::supplement, (new SecureRandom().nextInt(4) + 1) * 100, TimeUnit.MILLISECONDS);
-            }
-        }
-        return id;*/
     }
 
     /**
      * 补充缓存
      */
     private void supplement() {
-//        lock.lock();
         lock.writeLock().lock();
         try {
             if (suppleState.get() != WAIT_SUPPLE) {
@@ -183,7 +147,6 @@ public class SegmentIdDoubleBufferGenerator extends AbstractSegmentIdGenerator {
             //补充完毕
             suppleState.compareAndSet(WAIT_SUPPLE, ADDED);
         } finally {
-//            lock.unlock();
             lock.writeLock().unlock();
         }
     }

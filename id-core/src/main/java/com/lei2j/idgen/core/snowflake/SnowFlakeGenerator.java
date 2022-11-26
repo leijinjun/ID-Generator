@@ -53,12 +53,16 @@ public class SnowFlakeGenerator implements IdGenerator {
     /**
      * 使用默认的配置项{@Link DefaultSnowFlakeConfig}
      */
-    public SnowFlakeGenerator(){
-        this(new DefaultSnowFlakeConfig(),new LocalClock());
+    public SnowFlakeGenerator() {
+        this(new LocalClock());
     }
 
     public SnowFlakeGenerator(Clock clock) {
-        this(new DefaultSnowFlakeConfig(), clock);
+        this(new SnowFlakeConfig(), clock);
+    }
+
+    public SnowFlakeGenerator(SnowFlakeConfig snowFlakeConfig) {
+        this(snowFlakeConfig, new LocalClock());
     }
 
     /**

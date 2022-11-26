@@ -9,8 +9,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  **/
 public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
 
-//    private final ReentrantLock lock = new ReentrantLock(false);
-
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
 
     /**
@@ -30,7 +28,9 @@ public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
 
     @Override
     public void initBuffer() {
-        assert !init;
+        if (init) {
+            throw new IllegalStateException("Initialized");
+        }
         supplement();
         init = true;
     }
@@ -72,23 +72,5 @@ public class SegmentIdBufferGenerator extends AbstractSegmentIdGenerator {
                 return null;
             }
         }
-        /*Object serialNo;
-        while ((serialNo = idSegment.getSerialNo()) == null) {
-            try {
-                if (lock.tryLock(50, TimeUnit.MILLISECONDS)) {
-                    try {
-                        if (idSegment.remain() <= 0) {
-                            supplement();
-                        }
-                    } finally {
-                        lock.unlock();
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-        return serialNo;*/
     }
 }

@@ -1,5 +1,5 @@
 ### ID-Generator
-唯一ID生成器，支持数据库方式生成ID、雪花算法。
+唯一ID生成器，支持使用数据库方式或雪花算法生成ID。
 ### 介绍
 id-core包为id生成算法实现。
 ID资源：指id源。如数据库、Redis、应用程序等可以产生ID的源。ID源需保证生产的ID在所需要的应用程序内唯一。
@@ -8,13 +8,20 @@ ID资源：指id源。如数据库、Redis、应用程序等可以产生ID的源
 2. **IDResource**接口。定义Id资源器。
 3. **SnowFlakeGenerator**雪花ID生成器。
 ### 快速开始
-id-extension模块
-1. 生成雪花ID
+id-extend模块  
+
+1.根据雪花算法生成ID
 ```java
+//单体应用程序case
 final IdGenerator snowFlakeGenerator = new SnowFlakeGenerator();
 final Long next = (Long) snowFlakeGenerator.next();
+//集群
+//其中workId通过接口WorkIdConfig获取
+WorkIdConfig workIdConfig = new DatabaseWorkIdConfig();
+SnowFlakeConfig snowFlakeConfig = new SnowFlakeConfig(timestampBits,workerIdBits,sequenceBits,workIdConfig.initWorkId());
+IdGenerator snowFlakeGenerator = new SnowFlakeGenerator(snowFlakeConfig);
 ```
-2. 从数据库生成ID
+2.从数据库生成ID
 ```java
 /**
  * 基于Mysql的悲观锁ID资源器实现
@@ -43,8 +50,22 @@ public class DefaultIdSegmentResource {
 
 }
 
+//创建id资源器
+DefaultIdSegmentResource resource = new DefaultIdSegmentResource();
+//将Id资源器与IdGenerator绑定
+SegmentGenerator segmentGenerator = new SegmentIdBufferGenerator(()->resource.getIdSegment("bizType"));
+or
+SegmentGenerator segmentGenerator = new SegmentIdDoubleBufferGenerator(()->resource.getIdSegment("bizType"));
+//获取id
+segmentGenerator.next();
+
+//对SegmentGenerator进行缓存
 @Component
 public class DefaultIdGen {
+
+    private final Map<String, SegmentGenerator> segmentGeneratorMap = new HashMap<>();
+
+    private final Map<String, IDResource> idResourceMap = new HashMap<>();
 
     private final DefaultIdSegmentResource resource;
 
@@ -53,16 +74,18 @@ public class DefaultIdGen {
     }
 
     public Object next(String businessType) {
-        final IDResource idResource = () -> resource.getIdSegment(businessType);
-        final SegmentIdBufferGenerator generator = new SegmentIdBufferGenerator(idResource);
-        return generator.next();
+        if (!segmentGeneratorMap.containsKey(businessType)) {
+            synchronized (this) {
+                if (!segmentGeneratorMap.containsKey(businessType)) {
+                    idResourceMap.putIfAbsent(businessType, () -> resource.getIdSegment(businessType));
+                    IDResource idResource = idResourceMap.get(businessType);
+                    segmentGeneratorMap.putIfAbsent(businessType, new SegmentIdBufferGenerator(idResource));
+                }
+            }
+        }
+        final SegmentGenerator segmentGenerator = segmentGeneratorMap.get(businessType);
+        return segmentGenerator.next();
     }
 }
 
-//id资源器
-DefaultIdSegmentResource resource = new DefaultIdSegmentResource();
-//将Id资源器与IdGenerator绑定
-DefaultIdGen idGen = new DefaultIdGen();
-//获取id
-Object next = idGen.next('businessType');
 ```

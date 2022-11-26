@@ -8,8 +8,8 @@ package com.lei2j.idgen.core.segment;
 public interface ID {
 
     /**
-     * 获取唯一一个序列号
-     * @return 返回一个唯一id，
+     * 获取唯一一个id，需保证不同线程返回不同id
+     * @return 返回一个唯一id
      */
     Object getId();
 

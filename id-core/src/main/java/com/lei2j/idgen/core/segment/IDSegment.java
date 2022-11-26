@@ -23,10 +23,11 @@ public class IDSegment implements ID {
 
     /**
      * 构造一个顺序增长的Id分段存储器
+     *
      * @param minId 最小id（包含）
      * @param maxId 最大id（不包含）
      */
-    public IDSegment(long minId, long maxId) {
+    public IDSegment(long minId, long maxId, BizType bizType) {
         this.minId = minId;
         this.maxId = maxId;
         this.curId = new AtomicLong(minId);

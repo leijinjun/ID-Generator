@@ -5,35 +5,59 @@ package com.lei2j.idgen.core.snowflake;
  * @author leijinjun
  * @date 2022/2/8
  **/
-public interface SnowFlakeConfig {
+public class SnowFlakeConfig {
 
     /**
-     * 获取时间戳 bit位数
-     * @return
+     *  默认应用id，用于单体应用程序的默认机器id
      */
-    long getTimeBits();
+    public final static long DEFAULT_WORK_ID = 1;
+    /**
+     * 时间戳bit位数
+     */
+    private long timestampBits = 41L;
 
     /**
-     * 获取机器ID bit位数
-     * @return
+     * 机器ID bit位数
      */
-    long getWorkerBits();
+    private long workerIdBits = 10L;
 
     /**
-     * 获取序列号bit位数
-     * @return
+     * 序列号 bit位数
      */
-    long getSequenceBits();
+    private long sequenceBits = 12L;
 
     /**
-     * 根据{@link #getWorkerBits()}，返回最大节点id
-     * @return 最大节点id
+     * 节点id
      */
-    long maxWorkId();
+    private long workId = DEFAULT_WORK_ID;
 
-    /**
-     * 返回一个节点id
-     * @return 节点id
-     */
-    long getWorkId();
+    public SnowFlakeConfig() {
+    }
+
+    public SnowFlakeConfig(long timestampBits, long workerIdBits, long sequenceBits, long workId) {
+        this.timestampBits = timestampBits;
+        this.workerIdBits = workerIdBits;
+        this.sequenceBits = sequenceBits;
+        this.workId = workId;
+    }
+
+    public long getTimeBits() {
+        return timestampBits;
+    }
+
+    public long getWorkerBits() {
+        return workerIdBits;
+    }
+
+    public long getSequenceBits() {
+        return sequenceBits;
+    }
+
+    public long maxWorkId() {
+        return ~(-1L << workerIdBits);
+    }
+
+    public long getWorkId() {
+        return workId;
+    }
 }
