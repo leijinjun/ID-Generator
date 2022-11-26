@@ -5,14 +5,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.lei2j</groupId>
-  <artifactId>ID-Generator</artifactId>
+  <artifactId>id-generator</artifactId>
   <version>0.0.1</version>
   <modules>
-    <module>ID-Core</module>
-    <module>ID-Provider</module>
+    <module>id-core</module>
+    <module>id-extend</module>
+    <module>id-demo</module>
   </modules>
   <packaging>pom</packaging>
-  <name>ID-Generator</name>
+  <name>id-generator</name>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -24,6 +25,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <spring.cloud.version>2.2.5.RELEASE</spring.cloud.version>
+    <zk.curator.version>5.3.0</zk.curator.version>
   </properties>
 
   <dependencies>
@@ -40,6 +43,48 @@
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
         <version>5.1.49</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.11</version>
+      </dependency>
+      <dependency>
+        <groupId>cglib</groupId>
+        <artifactId>cglib</artifactId>
+        <version>3.3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper</artifactId>
+        <version>3.8.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
+        <version>${spring.cloud.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-zookeeper-config</artifactId>
+        <version>${spring.cloud.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.curator</groupId>
+        <artifactId>curator-recipes</artifactId>
+        <version>${zk.curator.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
