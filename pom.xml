@@ -88,7 +88,12 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
+  <distributionManagement>
+    <repository>
+      <id>release</id>
+      <url>https://nexus.lei2j.com:8000/repository/maven-releases/</url>
+    </repository>
+  </distributionManagement>
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
